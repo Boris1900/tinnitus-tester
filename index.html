@@ -84,6 +84,12 @@
   }
   .header-link:hover { text-decoration: underline; }
 
+  @media (max-width: 500px) {
+    .header-link {
+      display: none;
+    }
+  }
+
   /* ── HERO ── */
   .hero {
     background: #7ed957;
@@ -349,7 +355,7 @@
     border-radius: var(--radius);
     padding: 32px 28px;
     color: var(--text);
-    margin-top: 8px;
+    margin-top: 28px;
   }
   .lead-box h2 {
     font-size: 20px;
@@ -566,7 +572,6 @@
         <span>Tinnitus- und Innenohrtherapie · Ahrensburg</span>
       </div>
     </a>
-    <a class="header-link" href="https://www.tinnituspraxis-seedorf.de">← Zur Website</a>
   </div>
 </header>
 
