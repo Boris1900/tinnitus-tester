@@ -521,6 +521,35 @@
     transition: background .2s;
   }
   .rec-download:hover { background: #edfce5; }
+
+  .lr-check-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 18px;
+    font-size: 13px;
+    color: var(--text-mid);
+    cursor: pointer;
+  }
+  .lr-check-label input { cursor: pointer; accent-color: var(--green-dark); }
+  .lr-hint {
+    font-size: 13px;
+    color: var(--text-mid);
+    margin: 12px 0 16px;
+    line-height: 1.6;
+  }
+  .lr-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .lr-slot {
+    flex: 1 1 140px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
   .rec-note {
     font-size: 11px;
     color: var(--text-light);
@@ -599,7 +628,7 @@
   <!-- SCHRITT 1 -->
   <div class="schritt">
     <div class="schritt-nr">1</div>
-    <div class="schritt-text">Welcher Klang ähnelt Ihrem Tinnitus am meisten? – Schalter anklicken</div>
+    <div class="schritt-text">Welcher Klang ähnelt Ihrem Tinnitus am meisten? – Schalter anklicken, gegebenenfalls mehrere kombinieren</div>
   </div>
 
   <div class="sounds-grid">
@@ -801,10 +830,38 @@
   <!-- MP3-AUFNAHME -->
   <div class="mp3-box" id="mp3-box">
     <p class="mp3-box-intro">🎙️ <strong>Klang als MP3 speichern</strong> – zum Zeigen beim HNO oder für Familie und Freunde</p>
-    <button class="rec-btn" id="rec-btn" onclick="startRecording()">5 Sekunden aufnehmen</button>
-    <div class="rec-countdown" id="rec-countdown">Aufnahme läuft … <span class="rec-sec" id="rec-sec">5</span></div>
-    <br>
-    <a class="rec-download" id="rec-download">⬇ &nbsp;MP3 herunterladen</a>
+
+    <!-- Standard: eine Aufnahme -->
+    <div id="rec-single">
+      <button class="rec-btn" id="rec-btn" onclick="startRecording('single')">5 Sekunden aufnehmen</button>
+      <div class="rec-countdown" id="rec-countdown">Aufnahme läuft … <span class="rec-sec" id="rec-sec">5</span></div>
+      <br>
+      <a class="rec-download" id="rec-download">⬇ &nbsp;MP3 herunterladen</a>
+    </div>
+
+    <!-- Checkbox Links/Rechts -->
+    <label class="lr-check-label">
+      <input type="checkbox" id="lr-check" onchange="toggleLR()">
+      Mein Tinnitus klingt links und rechts unterschiedlich
+    </label>
+
+    <!-- Links/Rechts-Modus -->
+    <div id="rec-lr" style="display:none">
+      <p class="lr-hint">Stellen Sie die Töne für das <strong>linke Ohr</strong> ein, nehmen Sie auf und speichern Sie die Datei. Dann die Töne für das <strong>rechte Ohr</strong> einstellen und erneut aufnehmen.</p>
+      <div class="lr-row">
+        <div class="lr-slot">
+          <button class="rec-btn" id="rec-btn-l" onclick="startRecording('links')">Linkes Ohr aufnehmen</button>
+          <div class="rec-countdown" id="rec-countdown-l">Aufnahme läuft … <span class="rec-sec" id="rec-sec-l">5</span></div>
+          <a class="rec-download" id="rec-download-l">⬇ &nbsp;Linkes Ohr herunterladen</a>
+        </div>
+        <div class="lr-slot">
+          <button class="rec-btn" id="rec-btn-r" onclick="startRecording('rechts')">Rechtes Ohr aufnehmen</button>
+          <div class="rec-countdown" id="rec-countdown-r">Aufnahme läuft … <span class="rec-sec" id="rec-sec-r">5</span></div>
+          <a class="rec-download" id="rec-download-r">⬇ &nbsp;Rechtes Ohr herunterladen</a>
+        </div>
+      </div>
+    </div>
+
     <div class="rec-note">Mono · 192 kbps · läuft komplett in Ihrem Browser – keine Daten werden hochgeladen</div>
   </div>
 
@@ -1126,7 +1183,8 @@ function updateUI() {
   }
   // MP3-Box – bleibt sichtbar solange ein Download bereit liegt
   const mp3box = document.getElementById('mp3-box');
-  const dlReady = document.getElementById('rec-download').style.display === 'inline-block';
+  const dlReady = ['rec-download','rec-download-l','rec-download-r']
+    .some(id => document.getElementById(id).style.display === 'inline-block');
   if (active.length > 0 || dlReady) { mp3box.classList.add('visible'); }
   else { mp3box.classList.remove('visible'); }
 
@@ -1146,25 +1204,38 @@ let isRecording = false;
 let pcmBuffer    = [];
 let scriptProc   = null;
 
-function startRecording() {
+function toggleLR() {
+  const checked = document.getElementById('lr-check').checked;
+  document.getElementById('rec-single').style.display = checked ? 'none' : 'block';
+  document.getElementById('rec-lr').style.display     = checked ? 'block' : 'none';
+}
+
+function startRecording(side) {
   if (isRecording) return;
   if (!ctx || Object.keys(nodes).length === 0) {
     alert('Bitte zuerst einen Klang einschalten.');
     return;
   }
 
+  const elMap = {
+    single: { btn: 'rec-btn',   cd: 'rec-countdown',   sec: 'rec-sec',   dl: 'rec-download',   suffix: ''       },
+    links:  { btn: 'rec-btn-l', cd: 'rec-countdown-l', sec: 'rec-sec-l', dl: 'rec-download-l', suffix: '-links' },
+    rechts: { btn: 'rec-btn-r', cd: 'rec-countdown-r', sec: 'rec-sec-r', dl: 'rec-download-r', suffix: '-rechts'},
+  };
+  const el = elMap[side] || elMap.single;
+
   isRecording = true;
   pcmBuffer   = [];
 
-  const btn       = document.getElementById('rec-btn');
-  const countdown = document.getElementById('rec-countdown');
-  const secEl     = document.getElementById('rec-sec');
-  const dlBtn     = document.getElementById('rec-download');
+  const btn       = document.getElementById(el.btn);
+  const countdown = document.getElementById(el.cd);
+  const secEl     = document.getElementById(el.sec);
+  const dlBtn     = document.getElementById(el.dl);
 
-  btn.disabled          = true;
-  dlBtn.style.display   = 'none';
+  btn.disabled            = true;
+  dlBtn.style.display     = 'none';
   countdown.style.display = 'block';
-  secEl.textContent     = '5';
+  secEl.textContent       = '5';
 
   // ScriptProcessorNode zapft den masterGain ab (silent output → kein Doppel-Lautstärke-Problem)
   const silentGain = ctx.createGain();
@@ -1181,19 +1252,18 @@ function startRecording() {
     pcmBuffer.push(new Float32Array(ch));
   };
 
-  // Countdown
   let remaining = 5;
   const timer = setInterval(() => {
     remaining--;
     secEl.textContent = remaining;
     if (remaining <= 0) {
       clearInterval(timer);
-      finishRecording(btn, countdown, dlBtn, silentGain);
+      finishRecording(btn, countdown, dlBtn, silentGain, el.suffix);
     }
   }, 1000);
 }
 
-function finishRecording(btn, countdown, dlBtn, silentGain) {
+function finishRecording(btn, countdown, dlBtn, silentGain, suffix) {
   isRecording = false;
 
   if (scriptProc) {
@@ -1234,17 +1304,16 @@ function finishRecording(btn, countdown, dlBtn, silentGain) {
   const blob = new Blob(mp3Data, { type: 'audio/mp3' });
   const url  = URL.createObjectURL(blob);
 
-  // Dateiname mit aktuellem Datum
   const d  = new Date();
   const dd = String(d.getDate()).padStart(2, '0');
   const mm = String(d.getMonth() + 1).padStart(2, '0');
   const yy = d.getFullYear();
-  const filename = `mein-tinnitus_${yy}-${mm}-${dd}.mp3`;
+  const filename = `mein-tinnitus${suffix}_${yy}-${mm}-${dd}.mp3`;
 
-  dlBtn.href             = url;
-  dlBtn.download         = filename;
-  dlBtn.style.display    = 'inline-block';
-  dlBtn.textContent      = `⬇  ${filename} herunterladen`;
+  dlBtn.href          = url;
+  dlBtn.download      = filename;
+  dlBtn.style.display = 'inline-block';
+  dlBtn.textContent   = `⬇  ${filename} herunterladen`;
 }
 
 </script>
