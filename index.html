@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js"></script>
+<script src="https://assets.quentn.com/fb/0.4/dist-user-wc/embed-form.umd.min.js" defer></script>
 <style>
   :root {
     --bg:         #ece9e1;
@@ -808,18 +809,8 @@
       <h2>Möchten Sie tiefer einsteigen?</h2>
       <p>Der kostenlose <strong>Tinnitus-Kompass</strong> der Tinnituspraxis Seedorf erklärt die häufigsten Ursachen, das Drei-Säulen-Modell der Tinnitus-Behandlung – und gibt Ihnen erste Übungen an die Hand, die wirklich etwas bewegen können.</p>
 
-      <!-- QUENTN FORMULAR: Hier den Quentn-Einbettungscode einfügen -->
-      <!-- Bis zur Quentn-Integration: Platzhalter-Formular -->
-      <form id="contact-form" onsubmit="submitForm(event)">
-        <div class="form-row">
-          <input type="text" id="f-name" placeholder="Vor- und Zuname (optional)" autocomplete="name">
-        </div>
-        <div class="form-row">
-          <input type="email" id="f-email" placeholder="Ihre E-Mail-Adresse" required autocomplete="email">
-        </div>
-        <button type="submit" class="form-submit">Tinnitus-Kompass kostenlos erhalten →</button>
-        <div class="form-note">Kein Spam. Keine Weitergabe. Abmeldung jederzeit möglich.</div>
-      </form>
+      <!-- QUENTN FORMULAR -->
+      <qntn-form data-source="t88of5.eu-5.quentn-site.com" data-form-id="455"></qntn-form>
       <!-- /QUENTN -->
 
       <div class="success-box" id="success-box">
