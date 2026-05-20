@@ -329,6 +329,18 @@
     padding-top: 14px;
     margin-top: 4px;
   }
+  .result-empathie {
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+    margin-top: 14px;
+  }
+  .result-empathie p {
+    font-size: 14px;
+    color: var(--text-mid);
+    line-height: 1.75;
+    margin-bottom: 10px;
+  }
+  .result-empathie p:last-child { margin-bottom: 0; }
 
   /* ── LEAD FORM ── */
   .lead-box {
@@ -775,7 +787,9 @@
     <h2>Ihr persönliches Tinnitus-Klangprofil</h2>
     <p class="result-intro">Diese Klänge ähneln Ihrem Tinnitus am meisten:</p>
     <div class="result-tags" id="result-tags"></div>
-    <div class="result-hint" id="result-hint"></div>
+    <div class="result-empathie">
+      <p>Tinnitus ist für Außenstehende unsichtbar. Das macht ihn so schwer zu erklären. Mit diesem Klangprofil haben Sie jetzt etwas in der Hand: eine Audiodatei, die hörbar macht, was Sie täglich begleitet. Zeigen Sie sie Ihrer Familie oder Ihren Freunden. Manchmal reichen wenige Sekunden, um mehr Verständnis zu schaffen als viele Worte.</p>
+    </div>
   </div>
 
   <!-- MP3-AUFNAHME -->
@@ -1107,14 +1121,6 @@ const NAMES = {
   pfeif: 'Pfeifton', brumm: 'Brummton', rausch: 'Rauschen / Zischen',
   rasch: 'Rascheln / Wogen', kling: 'Klingeln / Glöckchen', puls: 'Pulsieren / Pochen'
 };
-const HINTS = {
-  pfeif: 'Pfeiftöne entstehen oft durch Schäden in den Haarzellen des Innenohrs.',
-  brumm: 'Brummtöne können durch Verspannungen, Blutdruckschwankungen oder Innenohrprobleme entstehen.',
-  rausch: 'Rauschen ist oft ein Zeichen von Durchblutungsstörungen oder Lärm-Schäden im Innenohr.',
-  rasch: 'Wellenartig wechselndes Rauschen kann auf eine überreizte Hörverarbeitung oder Durchblutungsschwankungen im Innenohr hinweisen.',
-  kling: 'Klingende Töne können auf Mittelohr-Probleme oder Hörverlust hinweisen.',
-  puls:  'Pulsierender Tinnitus ist oft mit dem Blutfluss verbunden – bitte zeitnah ärztlich abklären.'
-};
 
 function updateUI() {
   const active = Object.keys(nodes);
@@ -1137,14 +1143,9 @@ function updateUI() {
   // Ergebnis-Panel
   const panel = document.getElementById('result-panel');
   const tags  = document.getElementById('result-tags');
-  const hint  = document.getElementById('result-hint');
   if (active.length > 0) {
     panel.classList.add('visible');
     tags.innerHTML = active.map(id => `<span class="result-tag">✓ ${NAMES[id]}</span>`).join('');
-    const hintTexts = active.map(id => HINTS[id]).filter(Boolean);
-    hint.innerHTML = hintTexts.length > 0
-      ? '<strong>Gut zu wissen:</strong> ' + hintTexts[0] + '<br><br>Notieren Sie dieses Profil – es hilft Ihrem Therapeuten, Ihren Tinnitus gezielter zu behandeln.'
-      : '';
   } else {
     panel.classList.remove('visible');
   }
