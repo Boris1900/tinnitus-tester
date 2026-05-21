@@ -677,6 +677,10 @@
           <input type="range" id="sl-brumm-freq" min="50" max="500" value="120" step="10" oninput="updateSound('brumm')">
         </div>
         <div class="slider-row">
+          <div class="slider-label">Wärme <span class="slider-val" id="val-brumm-warm">warm</span></div>
+          <input type="range" id="sl-brumm-warm" min="2" max="10" value="4" step="1" oninput="updateSound('brumm')">
+        </div>
+        <div class="slider-row">
           <div class="slider-label">Lautstärke <span class="slider-val" id="val-brumm-vol">2%</span></div>
           <input type="range" id="sl-brumm-vol" min="1" max="100" value="2" oninput="updateSound('brumm')">
         </div>
@@ -951,18 +955,27 @@ function startPfeif() {
 }
 
 function startBrumm() {
-  const c    = getCtx();
-  const freq = +document.getElementById('sl-brumm-freq').value;
-  const vol  = +document.getElementById('sl-brumm-vol').value / 100 * 0.35;
-  const osc  = c.createOscillator();
-  const osc2 = c.createOscillator();
-  const gain = c.createGain();
+  const c      = getCtx();
+  const freq   = +document.getElementById('sl-brumm-freq').value;
+  const warm   = +document.getElementById('sl-brumm-warm').value; // 2=sehr warm, 10=hell
+  const vol    = +document.getElementById('sl-brumm-vol').value / 100 * 0.35;
+  const osc    = c.createOscillator();
+  const osc2   = c.createOscillator();
+  const gain   = c.createGain();
+  // Zwei Tiefpassfilter in Serie = 24 dB/Oktave
+  const lp1    = c.createBiquadFilter();
+  const lp2    = c.createBiquadFilter();
+  const cutoff = freq * warm; // Wärme-Regler steuert den Cutoff-Multiplikator
+  lp1.type = lp2.type = 'lowpass';
+  lp1.frequency.value = lp2.frequency.value = cutoff;
+  lp1.Q.value = lp2.Q.value = 0.7;
   osc.type  = 'sawtooth'; osc.frequency.value  = freq;
   osc2.type = 'sine';     osc2.frequency.value = freq * 2.01;
   gain.gain.value = vol;
-  osc.connect(gain); osc2.connect(gain); gain.connect(masterGain);
+  osc.connect(gain); osc2.connect(gain);
+  gain.connect(lp1); lp1.connect(lp2); lp2.connect(masterGain);
   osc.start(); osc2.start();
-  nodes.brumm = { osc, osc2, gain };
+  nodes.brumm = { osc, osc2, gain, lp1, lp2 };
 }
 
 function startRausch() {
@@ -1128,6 +1141,8 @@ function updateSliderLabels(id) {
   }
   if (id === 'brumm') {
     set('freq', freqLabel(get('freq'), 500) + ' · ' + get('freq') + ' Hz');
+    const w = get('warm');
+    set('warm', w <= 2 ? 'sehr warm' : w <= 4 ? 'warm' : w <= 6 ? 'mittel' : w <= 8 ? 'hell' : 'sehr hell');
     set('vol', get('vol') + '%');
   }
   if (id === 'rausch') {
