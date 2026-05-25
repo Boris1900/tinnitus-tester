@@ -557,36 +557,7 @@
     line-height: 1.7;
   }
 
-  /* ── STICKY BAR ── */
-  .sticky-bar {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    background: var(--footer-bg);
-    color: white;
-    padding: 12px 20px;
-    display: none;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    z-index: 100;
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.25);
-  }
-  .sticky-bar.visible { display: flex; }
-  .sticky-bar-text { font-size: 13px; font-weight: 600; }
-  .sticky-bar-text span { color: var(--green); }
-  .sticky-bar-btn {
-    background: var(--green);
-    color: var(--text);
-    border: none;
-    border-radius: 20px;
-    padding: 9px 20px;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-    font-family: inherit;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
+
 </style>
 </head>
 <body>
@@ -898,13 +869,6 @@
   </div>
 </footer>
 
-<!-- STICKY BAR -->
-<div class="sticky-bar" id="sticky-bar">
-  <div class="sticky-bar-text" id="sticky-bar-text">Klang aktiv</div>
-  <button class="sticky-bar-btn" onclick="document.getElementById('lead-section').scrollIntoView({behavior:'smooth'})">
-    Klangprofil sichern ↓
-  </button>
-</div>
 
 <script>
 // ── Audio Engine ──────────────────────────────────────────────
@@ -1186,16 +1150,6 @@ const NAMES = {
 
 function updateUI() {
   const active = Object.keys(nodes);
-  // Sticky Bar
-  const bar = document.getElementById('sticky-bar');
-  const barTxt = document.getElementById('sticky-bar-text');
-  if (active.length > 0) {
-    bar.classList.add('visible');
-    const names = active.map(id => NAMES[id]).join(', ');
-    barTxt.innerHTML = '<span>' + active.length + ' Klang' + (active.length > 1 ? 'typen' : '') + ' aktiv</span> – ' + names;
-  } else {
-    bar.classList.remove('visible');
-  }
   // MP3-Box – bleibt sichtbar solange ein Download bereit liegt
   const mp3box = document.getElementById('mp3-box');
   const dlReady = ['rec-download','rec-download-l','rec-download-r']
@@ -1325,10 +1279,32 @@ function finishRecording(btn, countdown, dlBtn, silentGain, suffix) {
   const yy = d.getFullYear();
   const filename = `mein-tinnitus${suffix}_${yy}-${mm}-${dd}.mp3`;
 
-  dlBtn.href          = url;
-  dlBtn.download      = filename;
-  dlBtn.style.display = 'inline-block';
-  dlBtn.textContent   = `⬇  ${filename} herunterladen`;
+  const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) ||
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+  if (isIOS && navigator.canShare && navigator.canShare({ files: [new File([blob], filename, { type: 'audio/mp3' })] })) {
+    dlBtn.href          = url;
+    dlBtn.download      = filename;
+    dlBtn.style.display = 'inline-block';
+    dlBtn.textContent   = `⬇  ${filename} sichern`;
+    dlBtn.onclick = async (e) => {
+      e.preventDefault();
+      const file = new File([blob], filename, { type: 'audio/mp3' });
+      try {
+        await navigator.share({ files: [file], title: 'Mein Tinnitus-Klang' });
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          window.open(url);
+        }
+      }
+    };
+  } else {
+    dlBtn.href          = url;
+    dlBtn.download      = filename;
+    dlBtn.style.display = 'inline-block';
+    dlBtn.textContent   = `⬇  ${filename} herunterladen`;
+    dlBtn.onclick       = null;
+  }
 }
 
 </script>
