@@ -430,24 +430,20 @@
   .success-box h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
   .success-box p { font-size: 14px; color: var(--text-mid); line-height: 1.7; }
 
-  /* ── OHRENINSEL HINT ── */
+  /* ── OHRENINSEL HINT (innerhalb result-panel) ── */
   .ohreninsel-hint {
-    display: none;
-    background: var(--card-bg);
-    border: 1.5px solid var(--border);
-    border-left: 4px solid var(--green);
-    border-radius: var(--radius);
-    padding: 18px 20px;
-    margin-top: 14px;
+    display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 14px;
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+    margin-top: 14px;
   }
-  .ohreninsel-hint.visible { display: flex; }
-  .ohreninsel-hint-icon { width: 48px; height: 48px; border-radius: 11px; flex-shrink: 0; object-fit: cover; }
+  .ohreninsel-hint-icon { width: 44px; height: 44px; border-radius: 10px; flex-shrink: 0; object-fit: cover; }
   .ohreninsel-hint-body { flex: 1; }
-  .ohreninsel-hint-body strong { display: block; font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-  .ohreninsel-hint-body span { font-size: 13px; color: var(--text-mid); line-height: 1.6; }
-  .ohreninsel-hint-btn { display: inline-block; margin-top: 8px; font-size: 13px; font-weight: 700; color: var(--green-dark); text-decoration: none; }
+  .ohreninsel-hint-body strong { display: block; font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+  .ohreninsel-hint-body span { font-size: 12px; color: var(--text-mid); line-height: 1.6; }
+  .ohreninsel-hint-btn { display: inline-block; margin-top: 6px; font-size: 12px; font-weight: 700; color: var(--green-dark); text-decoration: none; }
   .ohreninsel-hint-btn:hover { text-decoration: underline; }
 
   /* ── DISCLAIMER ── */
@@ -821,6 +817,15 @@
     <div class="result-empathie">
       <p>Tinnitus ist für Außenstehende unsichtbar. Das macht ihn so schwer zu erklären. Mit diesem Klangprofil haben Sie jetzt etwas in der Hand: eine Audiodatei, die hörbar macht, was Sie täglich begleitet. Zeigen Sie sie Ihrer Familie oder Ihren Freunden. Manchmal reichen wenige Sekunden, um mehr Verständnis zu schaffen als viele Worte.</p>
     </div>
+    <div class="ohreninsel-hint">
+      <img class="ohreninsel-hint-icon" src="https://ohreninsel.tinnituspraxis-seedorf.de/icon.png" alt="Ohreninsel App">
+      <div class="ohreninsel-hint-body">
+        <strong>Wenn er lauter wird – Ohreninsel.</strong>
+        <span>Echte Naturklänge als App. Helfen, wenn der Tinnitus stresst oder beim Einschlafen stört. Kostenlos, auch ohne WLAN.</span>
+        <br>
+        <a class="ohreninsel-hint-btn" href="https://ohreninsel.tinnituspraxis-seedorf.de" target="_blank">Zur Ohreninsel →</a>
+      </div>
+    </div>
   </div>
 
   <!-- MP3-AUFNAHME -->
@@ -859,17 +864,6 @@
     </div>
 
     <div class="rec-note">Mono · 192 kbps · läuft komplett in Ihrem Browser – keine Daten werden hochgeladen</div>
-  </div>
-
-  <!-- OHRENINSEL HINT -->
-  <div class="ohreninsel-hint" id="ohreninsel-hint">
-    <img class="ohreninsel-hint-icon" src="https://ohreninsel.tinnituspraxis-seedorf.de/icon.png" alt="Ohreninsel App">
-    <div class="ohreninsel-hint-body">
-      <strong>Wenn er lauter wird – Ohreninsel.</strong>
-      <span>Echte Naturklänge als App auf dem Handy. Helfen, wenn der Tinnitus stresst oder beim Einschlafen stört. Kostenlos, auch ohne WLAN.</span>
-      <br>
-      <a class="ohreninsel-hint-btn" href="https://ohreninsel.tinnituspraxis-seedorf.de" target="_blank">Zur Ohreninsel →</a>
-    </div>
   </div>
 
   <!-- LEAD FORM -->
@@ -1192,14 +1186,11 @@ function updateUI() {
   // Ergebnis-Panel
   const panel = document.getElementById('result-panel');
   const tags  = document.getElementById('result-tags');
-  const oiHint = document.getElementById('ohreninsel-hint');
   if (active.length > 0) {
     panel.classList.add('visible');
     tags.innerHTML = active.map(id => `<span class="result-tag">✓ ${NAMES[id]}</span>`).join('');
-    oiHint.classList.add('visible');
   } else {
     panel.classList.remove('visible');
-    oiHint.classList.remove('visible');
   }
 }
 
