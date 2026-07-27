@@ -823,7 +823,7 @@
         <strong>Wenn er lauter wird – Ohreninsel.</strong>
         <span>Echte Naturklänge als App. Helfen, wenn der Tinnitus stresst oder beim Einschlafen stört. Kostenlos, auch ohne WLAN.</span>
         <br>
-        <a class="ohreninsel-hint-btn" href="https://ohreninsel.tinnituspraxis-seedorf.de" target="_blank">Zur Ohreninsel →</a>
+        <a class="ohreninsel-hint-btn" id="ohreninsel-hint-link" href="https://ohreninsel.tinnituspraxis-seedorf.de" target="_blank">Zur Ohreninsel →</a>
       </div>
     </div>
   </div>
@@ -1345,6 +1345,11 @@ function finishRecording(btn, countdown, dlBtn, silentGain, suffix) {
   if (params.get('ref') === 'alltagshelfer') {
     var leadSection = document.getElementById('lead-section');
     if (leadSection) leadSection.style.display = 'none';
+
+    /* Ohreninsel-Hinweiskarte: auf die barrierefreie Downloadseite
+       verlinken statt auf die E-Mail-Landingpage der Ohreninsel. */
+    var ohreninselLink = document.getElementById('ohreninsel-hint-link');
+    if (ohreninselLink) ohreninselLink.href = 'https://ohreninsel.tinnituspraxis-seedorf.de/download';
   }
 })();
 </script>
