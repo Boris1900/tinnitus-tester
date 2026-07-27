@@ -1335,5 +1335,19 @@ function finishRecording(btn, countdown, dlBtn, silentGain, suffix) {
 
 </script>
 
+<script>
+/* Kompass-Anmeldeformular ausblenden, wenn Besucher von einer bereits
+   E-Mail-freien Quelle kommen (z.B. Alltagshelfer-Landingpage für die
+   bestehende Liste). tester.tinnituspraxis-seedorf.de selbst bleibt
+   unverändert die Lead-Generierungs-Seite für alle anderen Besucher. */
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('ref') === 'alltagshelfer') {
+    var leadSection = document.getElementById('lead-section');
+    if (leadSection) leadSection.style.display = 'none';
+  }
+})();
+</script>
+
 </body>
 </html>
